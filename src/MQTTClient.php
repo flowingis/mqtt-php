@@ -16,10 +16,17 @@ abstract class MQTTClient extends Client
 {
     private $streamBuffer;
 
-    public function __construct()
+    public function __construct(
+        $clientId,
+        $cleansession,
+        $keepalive,
+        Connection $socket,
+        $dropQoS0 = true,
+        $publishOnPubrel = true,
+        $authToken = ''
+    )
     {
-        $args = func_get_args();
-        call_user_func_array(array('parent', '__construct'), $args);
+        parent::__construct($clientId, $cleansession, $keepalive, $socket, $dropQoS0, $publishOnPubrel, $authToken);
         $this->streamBuffer = new StreamBuffer();
     }
 
