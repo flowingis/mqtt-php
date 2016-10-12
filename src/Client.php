@@ -20,17 +20,17 @@ class Client
     public $cleansession;
     /** @var Connection */
     public $socket;
-    private $msgid = 1;
+    protected $msgid = 1;
     public $outbound;
-    private $outmsgs;
+    protected $outmsgs;
     public $inbound = [];
     public $connected = false;
     public $will = null;
     public $keepalive;
     public $lastPacket = null;
-    private $dropQoS0;
-    private $publishOnPubrel;
-    private $authToken;
+    protected $dropQoS0;
+    protected $publishOnPubrel;
+    protected $authToken;
 
     public function __construct(
         $clientId,
