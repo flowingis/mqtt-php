@@ -2,7 +2,6 @@
 
 namespace MQTTv311\Repository;
 
-use MQTTv311\Server;
 use MQTTv311\Client;
 
 class ClientRepositoryTest extends \PHPUnit_Framework_TestCase
@@ -15,13 +14,11 @@ class ClientRepositoryTest extends \PHPUnit_Framework_TestCase
         $sock2 = $this->prophesize('MQTTv311\Connection\Connection');
         $sock2->resourceId = 23;
 
-        $broker = new Server();
-
         $sock = $sock->reveal();
         $sock2 = $sock2->reveal();
 
-        $client1 = new Client(1, false, false, $sock, $broker->getDropQoS0(), $broker->getPublishOnPubrel());
-        $client2 = new Client(2, false, false, $sock2, $broker->getDropQoS0(), $broker->getPublishOnPubrel());
+        $client1 = new Client(1, $sock);
+        $client2 = new Client(2, $sock2);
 
         $repo = new ClientRepository();
         $this->assertEquals(null, $repo->getBySocket($sock));
@@ -40,13 +37,11 @@ class ClientRepositoryTest extends \PHPUnit_Framework_TestCase
         $sock2 = $this->prophesize('MQTTv311\Connection\Connection');
         $sock2->resourceId = 23;
 
-        $broker = new Server();
-
         $sock = $sock->reveal();
         $sock2 = $sock2->reveal();
 
-        $client1 = new Client(1, false, false, $sock, $broker->getDropQoS0(), $broker->getPublishOnPubrel());
-        $client2 = new Client(2, false, false, $sock2, $broker->getDropQoS0(), $broker->getPublishOnPubrel());
+        $client1 = new Client(1, $sock);
+        $client2 = new Client(2, $sock2);
 
         $repo = new ClientRepository();
         $this->assertFalse($repo->has($client1));

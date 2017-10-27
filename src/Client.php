@@ -17,46 +17,35 @@ class Client
     use LoggerAwareTrait;
 
     public $id;
-    public $cleansession;
+    public $cleansession = true;
     /** @var Connection */
     public $socket;
     protected $msgid = 1;
     public $outbound;
-    protected $outmsgs;
+    protected $outmsgs = [];
     public $inbound = [];
     public $connected = false;
-    public $will = null;
-    public $keepalive;
-    public $lastPacket = null;
-    protected $dropQoS0;
-    protected $publishOnPubrel;
-    protected $authToken;
+    public $will;
+    public $keepalive = 60;
+    public $lastPacket;
+    protected $dropQoS0 = true;
+    protected $publishOnPubrel = true;
+    protected $authToken = '';
 
     public function __construct(
         $clientId,
-        $cleansession,
-        $keepalive,
-        Connection $socket,
-        $dropQoS0 = true,
-        $publishOnPubrel = true,
-        $authToken = ''
+        Connection $socket
     ) {
         $this->id = $clientId;
-        $this->cleansession = $cleansession;
         $this->socket = $socket;
         $this->outbound = new ArrayCollection();
-        $this->outmsgs = []; # msgids to message objects
-        $this->keepalive = $keepalive;
-        $this->lastPacket = null;
-        $this->dropQoS0 = $dropQoS0;
-        $this->publishOnPubrel = $publishOnPubrel;
-        $this->authToken = $authToken;
         $this->setLogger(new NullLogger());
     }
 
-    function connect($username = null, $password = null)
+    public function connect($username = null, $password = null)
     {
         $connect = new Connect();
+        $connect->KeepAliveTimer = $this->keepalive;
         $connect->ClientIdentifier = $this->id;
         if ($username !== null) {
             $connect->setUsername($username);
@@ -269,5 +258,21 @@ class Client
     public function getAuthToken()
     {
         return $this->authToken;
+    }
+
+    /**
+     * @param bool $dropQoS0
+     */
+    public function setDropQoS0(bool $dropQoS0)
+    {
+        $this->dropQoS0 = $dropQoS0;
+    }
+
+    /**
+     * @param bool $publishOnPubrel
+     */
+    public function setPublishOnPubrel(bool $publishOnPubrel)
+    {
+        $this->publishOnPubrel = $publishOnPubrel;
     }
 }

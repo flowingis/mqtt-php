@@ -2,14 +2,12 @@
 
 namespace MQTTv311;
 
-use MQTTv311\Client;
 use MQTTv311\Connection\Connection;
 use MQTTv311\ControlPacket\Packet;
 use MQTTv311\ControlPacket\Pingreq;
 use MQTTv311\ControlPacket\Subscribe;
 use MQTTv311\Exception\MessageTooShortException;
 use MQTTv311\Exception\MQTTException;
-use MQTTv311\StreamBuffer;
 use Ratchet\RFC6455\Messaging\Frame;
 
 abstract class MQTTClient extends Client
@@ -18,15 +16,9 @@ abstract class MQTTClient extends Client
 
     public function __construct(
         $clientId,
-        $cleansession,
-        $keepalive,
-        Connection $socket,
-        $dropQoS0 = true,
-        $publishOnPubrel = true,
-        $authToken = ''
-    )
-    {
-        parent::__construct($clientId, $cleansession, $keepalive, $socket, $dropQoS0, $publishOnPubrel, $authToken);
+        Connection $socket
+    ) {
+        parent::__construct($clientId, $socket);
         $this->streamBuffer = new StreamBuffer();
     }
 
@@ -77,10 +69,10 @@ abstract class MQTTClient extends Client
      */
     public function handlePacket(Packet $packet)
     {
-        $method = "on" . ucfirst(strtolower(Packet::packetTypeName($packet->fh->MessageType)));
+        $method = "on".ucfirst(strtolower(Packet::packetTypeName($packet->fh->MessageType)));
 
         if (!is_callable([$this, $method])) {
-            throw new \Exception("Broker does not support message: " . $packet->fh->MessageType);
+            throw new \Exception("Broker does not support message: ".$packet->fh->MessageType);
         }
 
         $this->$method($packet);
@@ -95,12 +87,12 @@ abstract class MQTTClient extends Client
 
     public function onSuback($packet)
     {
-        $this->logger->info("Suback received msgId: " . $packet->messageIdentifier);
+        $this->logger->info("Suback received msgId: ".$packet->messageIdentifier);
     }
 
     public function onPuback($packet)
     {
-        $this->logger->info("Puback received msgId: " . $packet->messageIdentifier);
+        $this->logger->info("Puback received msgId: ".$packet->messageIdentifier);
     }
 
     public function onPubrec($packet)
@@ -118,9 +110,14 @@ abstract class MQTTClient extends Client
         $this->pubrel($packet->messageIdentifier);
     }
 
+    public function onPingresp($packet)
+    {
+        $this->logger->info("Pingresp received msgId: ".$packet->messageIdentifier);
+    }
+
     abstract public function onPublish($packet);
 
-    public function publish($topic, $msg = null, $qos, $retained = false)
+    public function publish($topic, $msg = null, $qos = 0, $retained = false)
     {
         $this->publishArrived($topic, $msg, $qos, $retained);
     }
