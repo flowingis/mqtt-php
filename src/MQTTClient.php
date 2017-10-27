@@ -8,7 +8,6 @@ use MQTTv311\ControlPacket\Pingreq;
 use MQTTv311\ControlPacket\Subscribe;
 use MQTTv311\Exception\MessageTooShortException;
 use MQTTv311\Exception\MQTTException;
-use Ratchet\RFC6455\Messaging\Frame;
 
 abstract class MQTTClient extends Client
 {
@@ -153,15 +152,5 @@ abstract class MQTTClient extends Client
     public function ping()
     {
         $this->sendPacket($this->socket, new Pingreq());
-    }
-
-    /**
-     * @param Connection $sock
-     * @param Packet $resp
-     */
-    public function sendPacket(Connection $sock, Packet $resp)
-    {
-        $this->logger->info('Send packet: %s', [get_class($resp)]);
-        $sock->send(new Frame($resp->pack(), true, Frame::OP_BINARY));
     }
 }
