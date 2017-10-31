@@ -111,7 +111,7 @@ abstract class MQTTClient extends Client
 
     public function onPingresp($packet)
     {
-        $this->logger->info("Pingresp received msgId: ".$packet->messageIdentifier);
+        $this->logger->info("Pingresp received");
     }
 
     abstract public function onPublish($packet);
